@@ -36,22 +36,6 @@ It supports:
 	- Particle Shield background
 	- Custom dropdown and polished controls
 
-## Screenshots
-
-> Add screenshots in `assets/screenshots/` with the filenames below to show live UI previews on GitHub.
-
-### Main UI
-
-![Main UI](./assets/screenshots/main-ui.png)
-
-### Password Generation + Strength Feedback
-
-![Strength and Findings](./assets/screenshots/strength-feedback.png)
-
-### Preset + Passphrase Mode
-
-![Preset and Passphrase Mode](./assets/screenshots/preset-passphrase.png)
-
 ## Tech Stack
 
 - Python
