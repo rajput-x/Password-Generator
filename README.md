@@ -1,5 +1,10 @@
 # Password-Generator
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![Django](https://img.shields.io/badge/Django-4.2.6-092E20)
+[![Repo](https://img.shields.io/badge/GitHub-Password--Generator-181717?logo=github)](https://github.com/rajput-x/Password-Generator)
+
 A modern Django-based password generator with a security-focused UI, passphrase mode, breach-awareness, and smart strength analysis.
 
 ## Overview
