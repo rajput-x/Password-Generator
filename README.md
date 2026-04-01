@@ -121,4 +121,6 @@ Supported variables:
 
 ## License
 
-This project is open for learning and portfolio/demo usage.
+This project is licensed under the **MIT License**.
+
+See the full license text in [`LICENSE`](./LICENSE).
