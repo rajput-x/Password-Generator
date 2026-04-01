@@ -129,10 +129,6 @@ Supported variables:
 - If static styles are stale, hard refresh browser (`Ctrl + F5`).
 - If a Python process is stuck, stop old process and rerun server/tests.
 
-## Maintainer
-
-- GitHub: [`@rajput-x`](https://github.com/rajput-x)
-
 ## License
 
 This project is licensed under the **MIT License**.
