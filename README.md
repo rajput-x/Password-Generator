@@ -10,7 +10,6 @@ A modern Django-based password generator with a security-focused UI, passphrase 
 ## Release Status
 
 - **Stable:** `v1.0.0`
-- **Repository:** [`rajput-x/Password-Generator`](https://github.com/rajput-x/Password-Generator)
 
 ## Overview
 
