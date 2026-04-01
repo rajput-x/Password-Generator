@@ -3,46 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Generator</title>
+    <title>Secure Password Generator</title>
     {% load static %}
-    <link href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'generator/styles.css' %}">
 </head>
 <body>
-    <div class="container">
-        <h1>Password Generator</h1>
-        <form method="post">
+    <div class="bg-grid"></div>
+    <div class="bg-vignette"></div>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+    <div class="particle-field" id="particleField" aria-hidden="true"></div>
+
+    <main class="page-wrap">
+        <section class="container" id="interactive-card">
+            <div class="topbar">
+                <div>
+                    <span class="brand-chip">🔐 Security Studio</span>
+                    <h1>Secure Password Generator</h1>
+                    <p class="subtitle">Modern password + passphrase creator with breach-aware checks.</p>
+                </div>
+                <button id="themeToggle" class="copy-btn" type="button" aria-label="Toggle theme">🌙 Theme</button>
+            </div>
+
+            <form method="post" class="generator-form">
             {% csrf_token %}
-            <div class="form-group">
-                <label for="length">Password Length:</label>
-                <input type="number" id="length" name="length" value="12" min="1" max="128" class="form-control">
-            </div>
-            
-            <div class="form-group">
-                <input type="checkbox" id="uppercase" name="uppercase" checked>
-                <label for="uppercase">Include Uppercase Letters</label>
-            </div>
-            
-            <div class="form-group">
-                <input type="checkbox" id="lowercase" name="lowercase" checked>
-                <label for="lowercase">Include Lowercase Letters</label>
-            </div>
-            
-            <div class="form-group">
-                <input type="checkbox" id="numbers" name="numbers" checked>
-                <label for="numbers">Include Numbers</label>
-            </div>
-            
-            <div class="form-group">
-                <input type="checkbox" id="symbols" name="symbols" checked>
-                <label for="symbols">Include Symbols</label>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Generate Password</button>
-        </form>
-        {% if password %}
-        <div id="result">{{ password }}</div>
-        {% endif %}
-    </div>
+                <div class="preset-row">
+                    <label for="preset">Quick Preset</label>
+                    <div class="preset-controls">
+                        <div class="preset-dropdown" id="presetDropdown">
+                            <input type="hidden" id="presetValue" name="preset" value="{{ selected_preset|default:'basic_web' }}">
+                            <button
+                                type="button"
+                                id="presetTrigger"
+                                class="preset-trigger"
+                                aria-haspopup="listbox"
+                                aria-expanded="false"
+                            >
+                                <span id="presetLabel">
+                                    {% for preset_key, preset_meta in presets.items %}
+                                        {% if selected_preset == preset_key %}{{ preset_meta.label }}{% endif %}
+                                    {% endfor %}
+                                </span>
+                                <span class="preset-caret">▾</span>
+                            </button>
+
+                            <ul id="presetMenu" class="preset-menu" role="listbox" aria-label="Quick Preset options">
+                                {% for preset_key, preset_meta in presets.items %}
+                                    <li>
+                                        <button
+                                            type="button"
+                                            class="preset-option {% if selected_preset == preset_key %}active{% endif %}"
+                                            data-value="{{ preset_key }}"
+                                            data-label="{{ preset_meta.label }}"
+                                            data-description="{{ preset_meta.description }}"
+                                        >
+                                            {{ preset_meta.label }}
+                                        </button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <button class="copy-btn" type="submit" name="action" value="apply_preset">Apply</button>
+                    </div>
+                    <p id="presetHint" class="preset-hint">
+                        {% for preset_key, preset_meta in presets.items %}
+                            {% if selected_preset == preset_key %}{{ preset_meta.description }}{% endif %}
+                        {% endfor %}
+                    </p>
+                </div>
+
+                <div class="mode-switch">
+                    <label class="option-item">
+                        <input type="radio" name="mode" value="password" {% if mode == 'password' %}checked{% endif %}>
+                        <span>Password</span>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="mode" value="passphrase" {% if mode == 'passphrase' %}checked{% endif %}>
+                        <span>Passphrase</span>
+                    </label>
+                </div>
+
+                <div id="passwordControls" {% if mode != 'password' %}class="hidden"{% endif %}>
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label for="length">Password Length</label>
+                            <span id="lengthValue">{{ length|default:16 }}</span>
+                        </div>
+                        <input
+                            type="range"
+                            id="length"
+                            name="length"
+                            value="{{ length|default:16 }}"
+                            min="8"
+                            max="64"
+                            step="1"
+                        >
+                    </div>
+
+                    <div class="options-grid">
+                        <label class="option-item">
+                            <input type="checkbox" id="uppercase" name="uppercase" {% if include_uppercase %}checked{% endif %}>
+                            <span>Uppercase (A-Z)</span>
+                        </label>
+
+                        <label class="option-item">
+                            <input type="checkbox" id="lowercase" name="lowercase" {% if include_lowercase %}checked{% endif %}>
+                            <span>Lowercase (a-z)</span>
+                        </label>
+
+                        <label class="option-item">
+                            <input type="checkbox" id="numbers" name="numbers" {% if include_numbers %}checked{% endif %}>
+                            <span>Numbers (0-9)</span>
+                        </label>
+
+                        <label class="option-item">
+                            <input type="checkbox" id="symbols" name="symbols" {% if include_symbols %}checked{% endif %}>
+                            <span>Symbols (!@#...)</span>
+                        </label>
+
+                        <label class="option-item full-width">
+                            <input type="checkbox" id="exclude_ambiguous" name="exclude_ambiguous" {% if exclude_ambiguous %}checked{% endif %}>
+                            <span>Exclude ambiguous characters (O, 0, I, l, 1)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="passphraseControls" {% if mode != 'passphrase' %}class="hidden"{% endif %}>
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label for="word_count">Words</label>
+                            <span id="wordCountValue">{{ word_count|default:5 }}</span>
+                        </div>
+                        <input type="range" id="word_count" name="word_count" value="{{ word_count|default:5 }}" min="3" max="8" step="1">
+                    </div>
+
+                    <div class="options-grid">
+                        <label class="option-item">
+                            <span>Separator</span>
+                            <input type="text" id="separator" name="separator" value="{{ separator|default:'-' }}" maxlength="2" class="inline-input">
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" id="capitalize_words" name="capitalize_words" {% if capitalize_words %}checked{% endif %}>
+                            <span>Capitalize each word</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" id="append_number" name="append_number" {% if append_number %}checked{% endif %}>
+                            <span>Append number</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" id="append_symbol" name="append_symbol" {% if append_symbol %}checked{% endif %}>
+                            <span>Append symbol</span>
+                        </label>
+                    </div>
+                </div>
+
+                <label class="option-item full-width breach-option">
+                    <input type="checkbox" id="check_breach" name="check_breach">
+                    <span>Check generated value against known breach dataset (HIBP k-anonymity)</span>
+                </label>
+
+                <div class="action-row">
+                    <button type="submit" class="btn" name="action" value="generate">Generate</button>
+                    <button type="submit" class="btn secondary" name="action" value="variations">Generate 3 Variations</button>
+                </div>
+            </form>
+
+            {% if error %}
+                <div class="alert error">{{ error }}</div>
+            {% endif %}
+
+            {% if breach_message %}
+                <div class="alert {% if breach_count and breach_count > 0 %}error{% else %}info{% endif %}">{{ breach_message }}</div>
+            {% endif %}
+
+            {% if recommendation_message %}
+                <div class="alert suggestion">{{ recommendation_message }}</div>
+            {% endif %}
+
+            {% if password %}
+                <div class="result-box">
+                    <div id="result">{{ password }}</div>
+                    <button id="copyBtn" class="copy-btn" type="button">Copy</button>
+                </div>
+
+                {% if strength %}
+                    <div class="strength-wrap">
+                        <div class="strength-header">
+                            <span>Password Strength</span>
+                            <strong>{{ strength.label }}</strong>
+                        </div>
+                        <div class="strength-bar">
+                            <div class="strength-fill score-{{ strength.score }}"></div>
+                        </div>
+                        <small>Estimated entropy: {{ strength.entropy_bits }} bits</small>
+                        {% if strength.findings %}
+                            <ul class="strength-findings">
+                                {% for finding in strength.findings %}
+                                    <li>{{ finding }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            {% if variations %}
+                <div class="variation-wrap">
+                    <h3>One-click Variations</h3>
+                    <ul>
+                        {% for item in variations %}
+                            <li class="variation-item">{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <script src="{% static 'generator/app.js' %}"></script>
 </body>
 </html>
