@@ -7,6 +7,11 @@
 
 A modern Django-based password generator with a security-focused UI, passphrase mode, breach-awareness, and smart strength analysis.
 
+## Release Status
+
+- **Stable:** `v1.0.0`
+- **Repository:** [`rajput-x/Password-Generator`](https://github.com/rajput-x/Password-Generator)
+
 ## Overview
 
 This project helps users generate strong credentials quickly with practical real-world presets, animated premium UI, and safety guidance.
@@ -23,18 +28,18 @@ It supports:
 - **Secure random generation** using Python `secrets`
 - **Password + passphrase modes**
 - **Real-world presets**:
-	- Basic Web (balanced)
-	- High Security (recommended)
-	- Legacy Compatible (no symbols)
-	- Passphrase Strong
+  - Basic Web (balanced)
+  - High Security (recommended)
+  - Legacy Compatible (no symbols)
+  - Passphrase Strong
 - **One-click 3 variations**
 - **Strength meter with findings** (entropy + pattern penalties)
 - **Breach check support** with user guidance
 - **Custom animated UI**:
-	- Dark/light theme toggle
-	- Glassmorphism card styling
-	- Particle Shield background
-	- Custom dropdown and polished controls
+  - Dark/light theme toggle
+  - Glassmorphism card styling
+  - Particle Shield background
+  - Custom dropdown and polished controls
 
 ## Tech Stack
 
@@ -120,9 +125,13 @@ Supported variables:
 ## Troubleshooting
 
 - If server doesn’t start, verify Django is installed:
-	- `pip install -r requirements.txt`
+  - `pip install -r requirements.txt`
 - If static styles are stale, hard refresh browser (`Ctrl + F5`).
 - If a Python process is stuck, stop old process and rerun server/tests.
+
+## Maintainer
+
+- GitHub: [`@rajput-x`](https://github.com/rajput-x)
 
 ## License
 
