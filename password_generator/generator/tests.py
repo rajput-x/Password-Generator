@@ -84,6 +84,21 @@ class IndexViewTests(TestCase):
 		self.assertIsNotNone(response.context["password"])
 		self.assertIsNotNone(response.context["strength"])
 
+	def test_post_with_only_numbers_selected_generates_numeric_password(self):
+		response = self.client.post(
+			reverse("index"),
+			{
+				"action": "generate",
+				"mode": "password",
+				"length": 16,
+				"numbers": "on",
+			},
+		)
+		self.assertEqual(response.status_code, 200)
+		password = response.context["password"]
+		self.assertIsNotNone(password)
+		self.assertTrue(all(ch in string.digits for ch in password))
+
 	def test_post_with_invalid_length_shows_error(self):
 		response = self.client.post(
 			reverse("index"),

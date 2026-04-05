@@ -13,8 +13,8 @@ from .password_utils import (
     selected_character_pool_size,
 )
 
-def _parse_bool(post_data, key, default=False):
-    return key in post_data if key in post_data else default
+def _parse_bool(post_data, key):
+    return key in post_data
 
 def index(request):
     password = None
@@ -65,17 +65,17 @@ def index(request):
         else:
             mode = request.POST.get("mode", "password")
             length = int(request.POST.get("length", 16))
-            include_uppercase = _parse_bool(request.POST, "uppercase", True)
-            include_lowercase = _parse_bool(request.POST, "lowercase", True)
-            include_numbers = _parse_bool(request.POST, "numbers", True)
-            include_symbols = _parse_bool(request.POST, "symbols", True)
-            exclude_ambiguous = _parse_bool(request.POST, "exclude_ambiguous", False)
+            include_uppercase = _parse_bool(request.POST, "uppercase")
+            include_lowercase = _parse_bool(request.POST, "lowercase")
+            include_numbers = _parse_bool(request.POST, "numbers")
+            include_symbols = _parse_bool(request.POST, "symbols")
+            exclude_ambiguous = _parse_bool(request.POST, "exclude_ambiguous")
 
             word_count = int(request.POST.get("word_count", 5))
             separator = request.POST.get("separator", "-")[:2]
-            capitalize_words = _parse_bool(request.POST, "capitalize_words", False)
-            append_number = _parse_bool(request.POST, "append_number", True)
-            append_symbol = _parse_bool(request.POST, "append_symbol", True)
+            capitalize_words = _parse_bool(request.POST, "capitalize_words")
+            append_number = _parse_bool(request.POST, "append_number")
+            append_symbol = _parse_bool(request.POST, "append_symbol")
 
             if mode == "password":
                 if length < 8 or length > 64:
@@ -145,7 +145,7 @@ def index(request):
                         for _ in range(3)
                     ]
 
-            if password and _parse_bool(request.POST, "check_breach", False):
+            if password and _parse_bool(request.POST, "check_breach"):
                 breach_count = check_password_breach_count(password)
                 if breach_count is None:
                     breach_message = "Breach service is currently unavailable."
